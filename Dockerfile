@@ -167,6 +167,12 @@ COPY --from=compiler-helper-script /home/renderer/src/regional /home/renderer/sr
 
 COPY --from=compiler-stylesheet /root/openstreetmap-carto /home/renderer/src/openstreetmap-carto-backup
 
+# sed で external-data.yml のダウンロード先をローカルサーバーに置換する
+# https://osmdata.openstreetmap.de/download/ -> http://host.docker.internal:8044/ すべて置換
+# https://naturalearth.s3.amazonaws.com/110m_cultural/ -> http://host.docker.internal:8044/ すべて置換
+RUN sed -i 's,https://osmdata.openstreetmap.de/download/,http://host.docker.internal:8044/,g' /home/renderer/src/openstreetmap-carto-backup/external-data.yml \
+  && sed -i 's,https://naturalearth.s3.amazonaws.com/110m_cultural/,http://host.docker.internal:8044/,g' /home/renderer/src/openstreetmap-carto-backup/external-data.yml
+
 # Start running
 COPY run.sh /
 ENTRYPOINT ["/run.sh"]
